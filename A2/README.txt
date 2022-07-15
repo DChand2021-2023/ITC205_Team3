@@ -1,6 +1,7 @@
 *** README ***
 
-This zip file contains operational source code for Assignment 2 in the BRLS directory. 
+This zip file contains operational source code for Assignment 2 in the Backwoods Regional Library System  (BRLS)
+directory.
 
 Place the files contained in the 'src' directory in the project source folder of your chosen IDE.
 
