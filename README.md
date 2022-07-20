@@ -20,3 +20,4 @@ Failure to rename a local (method) variable counts as a single defect in the met
 Failure to rename a method counts as a single defect in the class it is declared. It is not a defect to use a defective method name in a referenced class, if that class was yet to be revised in the version of master from which the feature branch was formed.
 By Deepak
 
+Rishabh's first commit :) 
