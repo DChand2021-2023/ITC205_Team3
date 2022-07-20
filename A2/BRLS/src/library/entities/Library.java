@@ -116,17 +116,19 @@ public class Library implements Serializable {
 
 
 	// changed return type to void as per Code Style Guidelines Document
-	public void addPatron(String firstName, String lastName, String emailAddress, long phoneNumber) {		
-		Patron patron = new Patron(firstName, lastName, emailAddress, phoneNumber, getnextPatronId());
-		patrons.put(patron.getId(), patron);		
+	public void addPatron(String firstName, String lastName, String emailAddress, long phoneNumber) {
+		long patronId = getNextPatronId();
+		Patron patron = new Patron(firstName, lastName, emailAddress, phoneNumber, patronId);
+		patrons.put(patronId, patron);		
 		//return patron; 
 	}
 
 	
 	// changed return type to void as per Code Style Guidelines Document
-	public void addItem(String author, String title, String callNumber, ItemType itemType) {		
-		Item item = new Item(author, title, callNumber, itemType, getnextItemId());
-		catalog.put(item.getId(), item);		
+	public void addItem(String author, String title, String callNumber, ItemType itemType) {
+		long itemId = getNextItemId();
+		Item item = new Item(author, title, callNumber, itemType, itemId);
+		catalog.put(itemId, item);		
 		//return item;
 	}
 
@@ -168,7 +170,7 @@ public class Library implements Serializable {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -179,12 +181,14 @@ public class Library implements Serializable {
 
 	
 	public Loan issueLoan(Item item, Patron patron) {
+		long loanId = getNextLoanId();
 		Date dueDate = Calendar.getInstance().getDueDate(LOAN_PERIOD);
-		Loan loan = new Loan(getnextLoanId(), item, patron, dueDate);
+		Loan loan = new Loan(loanId, item, patron, dueDate);
+		long itemId = item.getId();
 		patron.takeOutLoan(loan);
 		item.takeOut();
-		loans.put(loan.getId(), loan);
-		currentLoans.put(item.getId(), loan);
+		loans.put(loanId, loan);
+		currentLoans.put(itemId, loan);
 		return loan;
 	}
 	
@@ -200,7 +204,8 @@ public class Library implements Serializable {
 	
 	public double calculateOverDueFine(Loan loan) {
 		if (loan.isOverDue()) {
-			long daysOverDue = Calendar.getInstance().getDaysDifference(loan.getDueDate());
+			Date dueDate = loan.getDueDate();
+			long daysOverDue = Calendar.getInstance().getDaysDifference(dueDate);
 			double fine = daysOverDue * FINE_PER_DAY;
 			return fine;
 		}
@@ -212,6 +217,7 @@ public class Library implements Serializable {
 	public void dischargeLoan(Loan currentLoan, boolean isDamaged) {
 		Patron patron = currentLoan.getPatron();
 		Item item  = currentLoan.getItem();
+		long itemId = item.getId();
 		
 		double overDueFine = calculateOverDueFine(currentLoan);
 		patron.addFine(overDueFine);	
@@ -220,11 +226,11 @@ public class Library implements Serializable {
 		item.takeBack(isDamaged);
 		if (isDamaged) {
 			patron.addFine(DAMAGE_FEE);
-			damagedItems.put(item.getId(), item);
+			damagedItems.put(itemId, item);
 		}
 
 		currentLoan.discharge();
-		currentLoans.remove(item.getId());
+		currentLoans.remove(itemId);
 	}
 
 
@@ -236,9 +242,10 @@ public class Library implements Serializable {
 
 
 	public void repairItem(Item currentItem) {
-		if (damagedItems.containsKey(currentItem.getId())) {
+		long currentItemId = currentItem.getId();
+		if (damagedItems.containsKey(currentItemId)) {
 			currentItem.repair();
-			damagedItems.remove(currentItem.getId());
+			damagedItems.remove(currentItemId);
 		} else {
 			throw new RuntimeException("Library: repairItem: item is not damaged");
 		}
