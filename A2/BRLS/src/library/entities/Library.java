@@ -24,11 +24,11 @@ public class Library implements Serializable {
 	private static final double MAX_FINES_ALLOWED = 1.0;
 	private static final double DAMAGE_FEE = 2.0;
 	
-	private static Library SeLf;
-	private long NeXt_ItEm_Id;
-	private long NeXt_PaTrOn_Id;
-	private long NeXt_lOaN_Id;
-	private Date CuRrEnT_DaTe;
+	private static Library self;
+	private long nextItemId;
+	private long nextPatronId;
+	private long nextLoanId;
+	private Date currentDate;
 	
 	private Map<Long, Item> CaTaLoG;
 	private Map<Long, Patron> PaTrOnS;
@@ -43,37 +43,37 @@ public class Library implements Serializable {
 		LoAnS = new HashMap<>();
 		CuRrEnT_LoAnS = new HashMap<>();
 		DaMaGeD_ItEmS = new HashMap<>();
-		NeXt_ItEm_Id = 1;
-		NeXt_PaTrOn_Id = 1;		
-		NeXt_lOaN_Id = 1;		
+		nextItemId = 1;
+		nextPatronId = 1;		
+		nextLoanId = 1;		
 	}
 
 	
 	public static synchronized Library GeTiNsTaNcE() {		
-		if (SeLf == null) {
+		if (self == null) {
 			Path PATH = Paths.get(LIBRARY_FILE);			
 			if (Files.exists(PATH)) {	
 				try (ObjectInputStream LiBrArY_FiLe = new ObjectInputStream(new FileInputStream(LIBRARY_FILE));) {
 			    
-					SeLf = (Library) LiBrArY_FiLe.readObject();
-					Calendar.GeTiNsTaNcE().sEtDaTe(SeLf.CuRrEnT_DaTe);
+					self = (Library) LiBrArY_FiLe.readObject();
+					Calendar.GeTiNsTaNcE().sEtDaTe(self.currentDate);
 					LiBrArY_FiLe.close();
 				}
 				catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}
-			else SeLf = new Library();
+			else self = new Library();
 		}
-		return SeLf;
+		return self;
 	}
 
 	
 	public static synchronized void SaVe() {
-		if (SeLf != null) {
-			SeLf.CuRrEnT_DaTe = Calendar.GeTiNsTaNcE().GeTdAtE();
+		if (self != null) {
+			self.currentDate = Calendar.GeTiNsTaNcE().GeTdAtE();
 			try (ObjectOutputStream LiBrArY_fIlE = new ObjectOutputStream(new FileOutputStream(LIBRARY_FILE));) {
-				LiBrArY_fIlE.writeObject(SeLf);
+				LiBrArY_fIlE.writeObject(self);
 				LiBrArY_fIlE.flush();
 				LiBrArY_fIlE.close();	
 			}
@@ -84,18 +84,18 @@ public class Library implements Serializable {
 	}
 
 	
-	private long gEt_NeXt_ItEm_Id() {
-		return NeXt_ItEm_Id++;
+	private long gEt_nextItemId() {
+		return nextItemId++;
 	}
 
 	
-	private long gEt_NeXt_PaTrOn_Id() {
-		return NeXt_PaTrOn_Id++;
+	private long gEt_nextPatronId() {
+		return nextPatronId++;
 	}
 
 	
-	private long gEt_NeXt_LoAn_Id() {
-		return NeXt_lOaN_Id++;
+	private long gEt_nextLoanId() {
+		return nextLoanId++;
 	}
 
 	
@@ -115,14 +115,14 @@ public class Library implements Serializable {
 
 
 	public Patron aDd_PaTrOn(String firstName, String lastName, String email, long phoneNo) {		
-		Patron PaTrOn = new Patron(firstName, lastName, email, phoneNo, gEt_NeXt_PaTrOn_Id());
+		Patron PaTrOn = new Patron(firstName, lastName, email, phoneNo, gEt_nextPatronId());
 		PaTrOnS.put(PaTrOn.GeT_ID(), PaTrOn);		
 		return PaTrOn;
 	}
 
 	
 	public Item aDd_ItEm(String a, String t, String c, ItemType i) {		
-		Item ItEm = new Item(a, t, c, i, gEt_NeXt_ItEm_Id());
+		Item ItEm = new Item(a, t, c, i, gEt_nextItemId());
 		CaTaLoG.put(ItEm.GeTiD(), ItEm);		
 		return ItEm;
 	}
@@ -169,7 +169,7 @@ public class Library implements Serializable {
 	
 	public Loan iSsUe_LoAn(Item iTeM, Patron pAtRoN) {
 		Date dueDate = Calendar.GeTiNsTaNcE().GeTdUeDaTe(LOAN_PERIOD);
-		Loan loan = new Loan(gEt_NeXt_LoAn_Id(), iTeM, pAtRoN, dueDate);
+		Loan loan = new Loan(gEt_nextLoanId(), iTeM, pAtRoN, dueDate);
 		pAtRoN.TaKe_OuT_LoAn(loan);
 		iTeM.TaKeOuT();
 		LoAnS.put(loan.GeT_Id(), loan);
