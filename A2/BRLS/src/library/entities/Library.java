@@ -54,7 +54,6 @@ public class Library implements Serializable {
 			Path PATH = Paths.get(LIBRARY_FILE);			
 			if (Files.exists(PATH)) {	
 				try (ObjectInputStream libraryFile = new ObjectInputStream(new FileInputStream(LIBRARY_FILE));) {
-			    
 					self = (Library) libraryFile.readObject();
 					Calendar.getInstance().setDate(self.currentDate);
 					libraryFile.close();
@@ -136,6 +135,7 @@ public class Library implements Serializable {
 		if (patrons.containsKey(patronId)) {
 			return patrons.get(patronId);
 		}
+
 		return null;
 	}
 
@@ -144,6 +144,7 @@ public class Library implements Serializable {
 		if (catalog.containsKey(itemId)) {
 			return catalog.get(itemId);	
 		}	
+
 		return null;
 	}
 
@@ -167,6 +168,7 @@ public class Library implements Serializable {
 				return false;
 			}
 		}
+		
 		return true;
 	}
 
