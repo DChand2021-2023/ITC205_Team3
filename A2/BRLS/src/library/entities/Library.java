@@ -30,19 +30,19 @@ public class Library implements Serializable {
 	private long nextLoanId;
 	private Date currentDate;
 	
-	private Map<Long, Item> CaTaLoG;
-	private Map<Long, Patron> PaTrOnS;
-	private Map<Long, Loan> LoAnS;
-	private Map<Long, Loan> CuRrEnT_LoAnS;
-	private Map<Long, Item> DaMaGeD_ItEmS;
+	private Map<Long, Item> catalog;
+	private Map<Long, Patron> patrons;
+	private Map<Long, Loan> loans;
+	private Map<Long, Loan> currentLoans;
+	private Map<Long, Item> damagedItems;
 	
 
 	private Library() {
-		CaTaLoG = new HashMap<>();
-		PaTrOnS = new HashMap<>();
-		LoAnS = new HashMap<>();
-		CuRrEnT_LoAnS = new HashMap<>();
-		DaMaGeD_ItEmS = new HashMap<>();
+		catalog = new HashMap<>();
+		patrons = new HashMap<>();
+		loans = new HashMap<>();
+		currentLoans = new HashMap<>();
+		damagedItems = new HashMap<>();
 		nextItemId = 1;
 		nextPatronId = 1;		
 		nextLoanId = 1;		
@@ -99,45 +99,45 @@ public class Library implements Serializable {
 	}
 
 	
-	public List<Patron> lIsT_PaTrOnS() {		
-		return new ArrayList<Patron>(PaTrOnS.values()); 
+	public List<Patron> lIsT_patrons() {		
+		return new ArrayList<Patron>(patrons.values()); 
 	}
 
 
 	public List<Item> lIsT_ItEmS() {		
-		return new ArrayList<Item>(CaTaLoG.values()); 
+		return new ArrayList<Item>(catalog.values()); 
 	}
 
 
-	public List<Loan> lISt_CuRrEnT_LoAnS() {
-		return new ArrayList<Loan>(CuRrEnT_LoAnS.values());
+	public List<Loan> lISt_currentLoans() {
+		return new ArrayList<Loan>(currentLoans.values());
 	}
 
 
 	public Patron aDd_PaTrOn(String firstName, String lastName, String email, long phoneNo) {		
 		Patron PaTrOn = new Patron(firstName, lastName, email, phoneNo, gEt_nextPatronId());
-		PaTrOnS.put(PaTrOn.GeT_ID(), PaTrOn);		
+		patrons.put(PaTrOn.GeT_ID(), PaTrOn);		
 		return PaTrOn;
 	}
 
 	
 	public Item aDd_ItEm(String a, String t, String c, ItemType i) {		
 		Item ItEm = new Item(a, t, c, i, gEt_nextItemId());
-		CaTaLoG.put(ItEm.GeTiD(), ItEm);		
+		catalog.put(ItEm.GeTiD(), ItEm);		
 		return ItEm;
 	}
 
 	
 	public Patron gEt_PaTrOn(long PaTrOn_Id) {
-		if (PaTrOnS.containsKey(PaTrOn_Id)) 
-			return PaTrOnS.get(PaTrOn_Id);
+		if (patrons.containsKey(PaTrOn_Id)) 
+			return patrons.get(PaTrOn_Id);
 		return null;
 	}
 
 	
 	public Item gEt_ItEm(long ItEm_Id) {
-		if (CaTaLoG.containsKey(ItEm_Id)) 
-			return CaTaLoG.get(ItEm_Id);		
+		if (catalog.containsKey(ItEm_Id)) 
+			return catalog.get(ItEm_Id);		
 		return null;
 	}
 
@@ -148,13 +148,13 @@ public class Library implements Serializable {
 
 	
 	public boolean cAn_PaTrOn_BoRrOw(Patron PaTrOn) {		
-		if (PaTrOn.gEt_nUmBeR_Of_CuRrEnT_LoAnS() == LOAN_LIMIT ) 
+		if (PaTrOn.gEt_nUmBeR_Of_currentLoans() == LOAN_LIMIT ) 
 			return false;
 				
 		if (PaTrOn.FiNeS_OwEd() >= MAX_FINES_ALLOWED) 
 			return false;
 				
-		for (Loan loan : PaTrOn.GeT_LoAnS()) 
+		for (Loan loan : PaTrOn.GeT_loans()) 
 			if (loan.Is_OvEr_DuE()) 
 				return false;
 			
@@ -162,8 +162,8 @@ public class Library implements Serializable {
 	}
 
 	
-	public int gEt_NuMbEr_Of_LoAnS_ReMaInInG_FoR_PaTrOn(Patron pAtRoN) {		
-		return LOAN_LIMIT - pAtRoN.gEt_nUmBeR_Of_CuRrEnT_LoAnS();
+	public int gEt_NuMbEr_Of_loans_ReMaInInG_FoR_PaTrOn(Patron pAtRoN) {		
+		return LOAN_LIMIT - pAtRoN.gEt_nUmBeR_Of_currentLoans();
 	}
 
 	
@@ -172,15 +172,15 @@ public class Library implements Serializable {
 		Loan loan = new Loan(gEt_nextLoanId(), iTeM, pAtRoN, dueDate);
 		pAtRoN.TaKe_OuT_LoAn(loan);
 		iTeM.TaKeOuT();
-		LoAnS.put(loan.GeT_Id(), loan);
-		CuRrEnT_LoAnS.put(iTeM.GeTiD(), loan);
+		loans.put(loan.GeT_Id(), loan);
+		currentLoans.put(iTeM.GeTiD(), loan);
 		return loan;
 	}
 	
 	
 	public Loan GeT_LoAn_By_ItEm_Id(long ITem_ID) {
-		if (CuRrEnT_LoAnS.containsKey(ITem_ID)) 
-			return CuRrEnT_LoAnS.get(ITem_ID);
+		if (currentLoans.containsKey(ITem_ID)) 
+			return currentLoans.get(ITem_ID);
 		
 		return null;
 	}
@@ -207,24 +207,24 @@ public class Library implements Serializable {
 		itEM.TaKeBaCk(iS_dAmAgEd);
 		if (iS_dAmAgEd) {
 			PAtrON.AdD_FiNe(DAMAGE_FEE);
-			DaMaGeD_ItEmS.put(itEM.GeTiD(), itEM);
+			damagedItems.put(itEM.GeTiD(), itEM);
 		}
 		cUrReNt_LoAn.DiScHaRgE();
-		CuRrEnT_LoAnS.remove(itEM.GeTiD());
+		currentLoans.remove(itEM.GeTiD());
 	}
 
 
-	public void UpDaTe_CuRrEnT_LoAnS_StAtUs() {
-		for (Loan lOaN : CuRrEnT_LoAnS.values()) 
+	public void UpDaTe_currentLoans_StAtUs() {
+		for (Loan lOaN : currentLoans.values()) 
 			lOaN.UpDaTeStAtUs();
 				
 	}
 
 
 	public void RePaIrITem(Item cUrReNt_ItEm) {
-		if (DaMaGeD_ItEmS.containsKey(cUrReNt_ItEm.GeTiD())) {
+		if (damagedItems.containsKey(cUrReNt_ItEm.GeTiD())) {
 			cUrReNt_ItEm.rEpAiR();
-			DaMaGeD_ItEmS.remove(cUrReNt_ItEm.GeTiD());
+			damagedItems.remove(cUrReNt_ItEm.GeTiD());
 		}
 		else 
 			throw new RuntimeException("Library: repairItem: item is not damaged");
