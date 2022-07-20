@@ -114,30 +114,32 @@ public class Library implements Serializable {
 	}
 
 
-	public Patron addPatron(String firstName, String lastName, String email, long phoneNo) {		
-		Patron PaTrOn = new Patron(firstName, lastName, email, phoneNo, getnextPatronId());
-		patrons.put(PaTrOn.GeT_ID(), PaTrOn);		
-		return PaTrOn;
+	// changed return type to void as per Code Style Guidelines Document
+	public void addPatron(String firstName, String lastName, String emailAddress, long phoneNumber) {		
+		Patron patron = new Patron(firstName, lastName, emailAddress, phoneNumber, getnextPatronId());
+		patrons.put(patron.getId(), patron);		
+		//return patron; 
 	}
 
 	
-	public Item addItem(String a, String t, String c, ItemType i) {		
-		Item ItEm = new Item(a, t, c, i, getnextItemId());
-		catalog.put(ItEm.GeTiD(), ItEm);		
-		return ItEm;
+	// changed return type to void as per Code Style Guidelines Document
+	public void addItem(String author, String title, String callNumber, ItemType itemType) {		
+		Item item = new Item(author, title, callNumber, itemType, getnextItemId());
+		catalog.put(item.getId(), item);		
+		//return item;
 	}
 
 	
-	public Patron getPatron(long PaTrOn_Id) {
-		if (patrons.containsKey(PaTrOn_Id)) 
-			return patrons.get(PaTrOn_Id);
+	public Patron getPatron(long patronId) {
+		if (patrons.containsKey(patronId)) 
+			return patrons.get(patronId);
 		return null;
 	}
 
 	
-	public Item getItem(long ItEm_Id) {
-		if (catalog.containsKey(ItEm_Id)) 
-			return catalog.get(ItEm_Id);		
+	public Item getItem(long itemId) {
+		if (catalog.containsKey(itemId)) 
+			return catalog.get(itemId);		
 		return null;
 	}
 
@@ -147,84 +149,84 @@ public class Library implements Serializable {
 	}
 
 	
-	public boolean canPatronBorrow(Patron PaTrOn) {		
-		if (PaTrOn.getnUmBeR_Of_currentLoans() == LOAN_LIMIT ) 
+	public boolean canPatronBorrow(Patron patron) {		
+		if (patron.getNumberOfCurrentLoans() == LOAN_LIMIT ) 
 			return false;
 				
-		if (PaTrOn.FiNeS_OwEd() >= MAX_FINES_ALLOWED) 
+		if (patron.getFinesOwed() >= MAX_FINES_ALLOWED) 
 			return false;
 				
-		for (Loan loan : PaTrOn.GeT_loans()) 
-			if (loan.Is_OvEr_DuE()) 
+		for (Loan loan : patron.getLoans()) 
+			if (loan.isOverDue()) 
 				return false;
 			
 		return true;
 	}
 
 	
-	public int getNumberOfLoansRemainingForPatron(Patron pAtRoN) {		
-		return LOAN_LIMIT - pAtRoN.getnUmBeR_Of_currentLoans();
+	public int getNumberOfLoansRemainingForPatron(Patron patron) {		
+		return LOAN_LIMIT - patron.getNumberOfCurrentLoans();
 	}
 
 	
-	public Loan issueLoan(Item iTeM, Patron pAtRoN) {
-		Date dueDate = Calendar.getInstance().GeTdUeDaTe(LOAN_PERIOD);
-		Loan loan = new Loan(getnextLoanId(), iTeM, pAtRoN, dueDate);
-		pAtRoN.TaKe_OuT_LoAn(loan);
-		iTeM.TaKeOuT();
-		loans.put(loan.GeT_Id(), loan);
-		currentLoans.put(iTeM.GeTiD(), loan);
+	public Loan issueLoan(Item item, Patron patron) {
+		Date dueDate = Calendar.getInstance().getDueDate(LOAN_PERIOD);
+		Loan loan = new Loan(getnextLoanId(), item, patron, dueDate);
+		patron.takeOutLoan(loan);
+		item.takeOut();
+		loans.put(loan.getId(), loan);
+		currentLoans.put(item.getId(), loan);
 		return loan;
 	}
 	
 	
-	public Loan getLoanByItemId(long ITem_ID) {
-		if (currentLoans.containsKey(ITem_ID)) 
-			return currentLoans.get(ITem_ID);
+	public Loan getLoanByItemId(long itemId) {
+		if (currentLoans.containsKey(itemId)) 
+			return currentLoans.get(itemId);
 		
 		return null;
 	}
 
 	
-	public double calculateOverDueFine(Loan LoAn) {
-		if (LoAn.Is_OvEr_DuE()) {
-			long DaYs_OvEr_DuE = Calendar.getInstance().GeTDaYsDiFfErEnCe(LoAn.GeT_DuE_DaTe());
-			double fInE = DaYs_OvEr_DuE * FINE_PER_DAY;
-			return fInE;
+	public double calculateOverDueFine(Loan loan) {
+		if (loan.isOverDue()) {
+			long daysOverDue = Calendar.getInstance().getDaysDifference(loan.getDueDate());
+			double fine = daysOverDue * FINE_PER_DAY;
+			return fine;
 		}
 		return 0.0;		
 	}
 
 
-	public void dischargeLoan(Loan cUrReNt_LoAn, boolean iS_dAmAgEd) {
-		Patron PAtrON = cUrReNt_LoAn.GeT_PaTRon();
-		Item itEM  = cUrReNt_LoAn.GeT_ITem();
+	public void dischargeLoan(Loan currentLoan, boolean isDamaged) {
+		Patron patron = currentLoan.getPatron();
+		Item item  = currentLoan.getItem();
 		
-		double oVeR_DuE_FiNe = CaLcUlAtE_OvEr_DuE_FiNe(cUrReNt_LoAn);
-		PAtrON.AdD_FiNe(oVeR_DuE_FiNe);	
+		double overDueFine = calculateOverDueFine(currentLoan);
+		patron.addFine(overDueFine);	
 		
-		PAtrON.dIsChArGeLoAn(cUrReNt_LoAn);
-		itEM.TaKeBaCk(iS_dAmAgEd);
-		if (iS_dAmAgEd) {
-			PAtrON.AdD_FiNe(DAMAGE_FEE);
-			damagedItems.put(itEM.GeTiD(), itEM);
+		patron.dischargeLoan(currentLoan);
+		item.takeBack(isDamaged);
+		if (isDamaged) {
+			patron.addFine(DAMAGE_FEE);
+			damagedItems.put(item.getId(), item);
 		}
-		cUrReNt_LoAn.DiScHaRgE();
-		currentLoans.remove(itEM.GeTiD());
+		currentLoan.discharge();
+		currentLoans.remove(item.getId());
 	}
 
 
 	public void updateCurrentLoansStatus() {
-		for (Loan lOaN : currentLoans.values()) 
-			lOaN.UpDaTeStAtUs();
+		for (Loan loan : currentLoans.values()) 
+			loan.updateStatus();
 				
 	}
 
 
-	public void repairItem(Item cUrReNt_ItEm) {
-		if (damagedItems.containsKey(cUrReNt_ItEm.GeTiD())) {
-			cUrReNt_ItEm.rEpAiR();
-			damagedItems.remove(cUrReNt_ItEm.GeTiD());
+	public void repairItem(Item currentItem) {
+		if (damagedItems.containsKey(currentItem.getId())) {
+			currentItem.repair();
+			damagedItems.remove(currentItem.getId());
 		}
 		else 
 			throw new RuntimeException("Library: repairItem: item is not damaged");
