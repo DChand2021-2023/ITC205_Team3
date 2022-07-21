@@ -6,8 +6,8 @@ import java.io.Serializable;
 public class Item implements Serializable {
 	
 	private ItemType TyPe;
-	private String aUtHoR;
-	private String TiTlE;
+	private String author;
+	private String title;
 	private String CaLlNo;
 	private long Id;
 	
