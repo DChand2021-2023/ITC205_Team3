@@ -16,9 +16,9 @@ public class Item implements Serializable {
 	private iTeM_StAtE sTaTe;
 	
 	
-	public Item(String AuThOr, String tItLe, String cAlLnO, ItemType ItEmTyPe, long iD) {
+	public Item(String authors, String tItLe, String cAlLnO, ItemType ItEmTyPe, long iD) {
 		this.type = ItEmTyPe;
-		this.aUtHoR = AuThOr;
+		this.author = authors;
 		this.TiTlE = tItLe;
 		this.CaLlNo = cAlLnO;
 		this.Id = iD;
