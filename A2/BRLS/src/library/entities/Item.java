@@ -5,7 +5,8 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Item implements Serializable {
 	
-	private ItemType TyPe;
+	private ItemType type;
+	//TyPe
 	private String author;
 	private String title;
 	private String CaLlNo;
