@@ -17,7 +17,7 @@ public class Item implements Serializable {
 	
 	
 	public Item(String AuThOr, String tItLe, String cAlLnO, ItemType ItEmTyPe, long iD) {
-		this.TyPe = ItEmTyPe;
+		this.type = ItEmTyPe;
 		this.aUtHoR = AuThOr;
 		this.TiTlE = tItLe;
 		this.CaLlNo = cAlLnO;
