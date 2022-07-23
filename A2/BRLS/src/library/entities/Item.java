@@ -69,12 +69,9 @@ public class Item implements Serializable {
 	public void takeOut() {
 		if (state.equals(ItemState.AVAILABLE)) {
 			state = ItemState.ON_LOAN;
-		}
-
-		else {
+		} else {
 			throw new RuntimeException(String.format("Item: cannot borrow item while item is in state: %s", state));
 		}
-
 	}
 
 
@@ -82,8 +79,7 @@ public class Item implements Serializable {
 		if (state.equals(ItemState.ON_LOAN)) {
 			if (damaged) {
 				state = ItemState.DAMAGED;
-			}
-			else {
+			} else {
 				state = ItemState.AVAILABLE;
 			}
 		}
