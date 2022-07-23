@@ -69,8 +69,7 @@ public class Patron implements Serializable {
     public void takeOutLoan(Loan loan) {
         if (!currentLoans.containsKey(loan.getId())) {
             currentLoans.put(loan.getId(), loan);
-        }
-        else { 
+        }else { 
             throw new RuntimeException("Duplicate loan added to member");
         }
     }
@@ -78,8 +77,7 @@ public class Patron implements Serializable {
     public void dischargeLoan(Loan loan) {
         if (currentLoans.containsKey(loan.getId())) {
             currentLoans.remove(loan.getId());
-        }
-        else {
+        }else {
             throw new RuntimeException("No such loan held by member");
         }		
     }
@@ -106,8 +104,7 @@ public class Patron implements Serializable {
         if (paymentAmount > finesOwing) {
             change = paymentAmount - finesOwing;
             finesOwing = 0;
-        }
-        else { 
+        }else { 
             finesOwing -= paymentAmount;
         }
         return change;
